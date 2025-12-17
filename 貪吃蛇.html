@@ -38,15 +38,22 @@
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-    const box = 20; // 每個方塊大小
+    const box = 20;
+
+    const snakeImg = new Image();
+    snakeImg.src = "images/snake-body.png";
+
+    const foodImg = new Image();
+    foodImg.src = "images/snake-food.png";
+
     let snake, direction, foods, score, lastTime, speed;
 
     function initGame() {
       snake = [{x: 300, y: 300}];
       direction = "RIGHT";
-      foods = generateFoods(5); // 一次生成 5 個食物
+      foods = generateFoods(5);
       score = 0;
-      speed = 100; // 固定速度 (毫秒)，不會隨分數改變
+      speed = 100;
       lastTime = 0;
       document.getElementById("score").innerText = "分數: " + score;
       requestAnimationFrame(gameLoop);
@@ -62,7 +69,6 @@
       if(event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
     }
 
-    // 生成多個食物，避免邊邊
     function generateFoods(count) {
       let arr = [];
       for(let i = 0; i < count; i++) {
@@ -77,19 +83,14 @@
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 畫蛇
       snake.forEach(part => {
-        ctx.fillStyle = "green";
-        ctx.fillRect(part.x, part.y, box, box);
+        ctx.drawImage(snakeImg, part.x, part.y, box, box);
       });
 
-      // 畫多個食物
       foods.forEach(food => {
-        ctx.fillStyle = "red";
-        ctx.fillRect(food.x, food.y, box, box);
+        ctx.drawImage(foodImg, food.x, food.y, box, box);
       });
 
-      // 畫分數
       document.getElementById("score").innerText = "分數: " + score;
     }
 
@@ -100,13 +101,11 @@
       if(direction === "LEFT") head.x -= box;
       if(direction === "RIGHT") head.x += box;
 
-      // 撞牆判斷
       if(head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) {
         alert("遊戲結束！分數: " + score);
         return false;
       }
 
-      // 撞到自己判斷
       for(let i = 0; i < snake.length; i++) {
         if(head.x === snake[i].x && head.y === snake[i].y) {
           alert("遊戲結束！分數: " + score);
@@ -116,13 +115,11 @@
 
       snake.unshift(head);
 
-      // 檢查是否吃到食物
       let ate = false;
       foods.forEach((food, index) => {
         if(head.x === food.x && head.y === food.y) {
           score++;
           ate = true;
-          // 替換成新的食物位置
           foods[index] = {
             x: Math.floor(Math.random() * ((canvas.width - box*2) / box) + 1) * box,
             y: Math.floor(Math.random() * ((canvas.height - box*2) / box) + 1) * box
@@ -140,19 +137,13 @@
     function gameLoop(timestamp) {
       if(timestamp - lastTime > speed) {
         lastTime = timestamp;
-        if(!update()) return; // 遊戲結束就停止
+        if(!update()) return;
         draw();
       }
       requestAnimationFrame(gameLoop);
     }
 
-    // 初始化遊戲
     initGame();
   </script>
 </body>
 </html>
-let snakeImg = new Image();
-snakeImg.src = "images/snake-body.png";
-
-let foodImg = new Image();
-foodImg.src = "images/snake-food.png";
