@@ -32,14 +32,16 @@
 <body>
   <h1>🐍 貪吃蛇遊戲</h1>
   <div id="score">分數: 0</div>
-  <canvas id="gameCanvas" width="600" height="600"></canvas>
+  <!-- 畫布加大到 800x800 -->
+  <canvas id="gameCanvas" width="800" height="800"></canvas>
   <button id="restartBtn">重新開始</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-    const box = 20;
+    const box = 40; // 每格大小加大到 40px
 
+    // 載入圖片
     const snakeImg = new Image();
     snakeImg.src = "snake-body.png";
 
@@ -49,11 +51,11 @@
     let snake, direction, foods, score, lastTime, speed;
 
     function initGame() {
-      snake = [{x: 300, y: 300}];
+      snake = [{x: 400, y: 400}];
       direction = "RIGHT";
-      foods = generateFoods(5);
+      foods = generateFoods(5); // 同時生成 5 個食物
       score = 0;
-      speed = 100;
+      speed = 120; // 固定速度
       lastTime = 0;
       document.getElementById("score").innerText = "分數: " + score;
       requestAnimationFrame(gameLoop);
@@ -69,6 +71,7 @@
       if(event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
     }
 
+    // 生成多個食物，避免邊邊
     function generateFoods(count) {
       let arr = [];
       for(let i = 0; i < count; i++) {
@@ -81,16 +84,21 @@
     }
 
     function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // 填背景色，避免透明圖片顯示成黑底
+      ctx.fillStyle = "#f0f0f0";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // 畫蛇
       snake.forEach(part => {
         ctx.drawImage(snakeImg, part.x, part.y, box, box);
       });
 
+      // 畫食物
       foods.forEach(food => {
         ctx.drawImage(foodImg, food.x, food.y, box, box);
       });
 
+      // 畫分數
       document.getElementById("score").innerText = "分數: " + score;
     }
 
@@ -101,11 +109,13 @@
       if(direction === "LEFT") head.x -= box;
       if(direction === "RIGHT") head.x += box;
 
+      // 撞牆判斷
       if(head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) {
         alert("遊戲結束！分數: " + score);
         return false;
       }
 
+      // 撞到自己判斷
       for(let i = 0; i < snake.length; i++) {
         if(head.x === snake[i].x && head.y === snake[i].y) {
           alert("遊戲結束！分數: " + score);
