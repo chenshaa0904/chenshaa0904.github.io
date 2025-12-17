@@ -21,26 +21,41 @@
       font-size: 20px;
       font-weight: bold;
     }
+    #restartBtn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h1>🐍 貪吃蛇遊戲</h1>
   <div id="score">分數: 0</div>
   <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <button id="restartBtn">重新開始</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const box = 20; // 每個方塊大小
-    let snake = [{x: 200, y: 200}];
-    let direction = "RIGHT";
-    let food = {
-      x: Math.floor(Math.random() * (canvas.width / box)) * box,
-      y: Math.floor(Math.random() * (canvas.height / box)) * box
-    };
-    let score = 0;
+    let snake, direction, food, score, game;
+
+    function initGame() {
+      snake = [{x: 200, y: 200}];
+      direction = "RIGHT";
+      food = {
+        x: Math.floor(Math.random() * (canvas.width / box)) * box,
+        y: Math.floor(Math.random() * (canvas.height / box)) * box
+      };
+      score = 0;
+      document.getElementById("score").innerText = "分數: " + score;
+      if (game) clearInterval(game);
+      game = setInterval(gameLoop, 150);
+    }
 
     document.addEventListener("keydown", changeDirection);
+    document.getElementById("restartBtn").addEventListener("click", initGame);
 
     function changeDirection(event) {
       if(event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
@@ -108,7 +123,8 @@
       draw();
     }
 
-    let game = setInterval(gameLoop, 150);
+    // 初始化遊戲
+    initGame();
   </script>
 </body>
 </html>
