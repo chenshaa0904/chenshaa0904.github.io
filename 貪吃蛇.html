@@ -32,30 +32,32 @@
 <body>
   <h1>🐍 貪吃蛇遊戲</h1>
   <div id="score">分數: 0</div>
-  <!-- 畫布加大到 800x800 -->
-  <canvas id="gameCanvas" width="800" height="800"></canvas>
+  <!-- 畫布改成 1000x800 -->
+  <canvas id="gameCanvas" width="1000" height="800"></canvas>
   <button id="restartBtn">重新開始</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-    const box = 40; // 每格大小加大到 40px
+    const box = 40;
 
-    // 載入圖片
-    const snakeImg = new Image();
-    snakeImg.src = "snake-body.png";
+    const snakeHeadImg = new Image();
+    snakeHeadImg.src = "images/snake-head.png";
+
+    const snakeBodyImg = new Image();
+    snakeBodyImg.src = "images/snake-body.png";
 
     const foodImg = new Image();
-    foodImg.src = "snake-food.png";
+    foodImg.src = "images/snake-food.png";
 
     let snake, direction, foods, score, lastTime, speed;
 
     function initGame() {
-      snake = [{x: 400, y: 400}];
+      snake = [{x: 200, y: 200}];
       direction = "RIGHT";
-      foods = generateFoods(5); // 同時生成 5 個食物
+      foods = generateFoods(5);
       score = 0;
-      speed = 120; // 固定速度
+      speed = 120;
       lastTime = 0;
       document.getElementById("score").innerText = "分數: " + score;
       requestAnimationFrame(gameLoop);
@@ -71,7 +73,6 @@
       if(event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
     }
 
-    // 生成多個食物，避免邊邊
     function generateFoods(count) {
       let arr = [];
       for(let i = 0; i < count; i++) {
@@ -83,22 +84,33 @@
       return arr;
     }
 
+    function drawSnakeHead(x, y) {
+      ctx.save();
+      ctx.translate(x + box/2, y + box/2);
+      if(direction === "UP") ctx.rotate(-Math.PI/2);
+      if(direction === "DOWN") ctx.rotate(Math.PI/2);
+      if(direction === "LEFT") ctx.rotate(Math.PI);
+      // RIGHT 不旋轉
+      ctx.drawImage(snakeHeadImg, -box/2, -box/2, box, box);
+      ctx.restore();
+    }
+
     function draw() {
-      // 填背景色，避免透明圖片顯示成黑底
       ctx.fillStyle = "#f0f0f0";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 畫蛇
-      snake.forEach(part => {
-        ctx.drawImage(snakeImg, part.x, part.y, box, box);
+      snake.forEach((part, index) => {
+        if(index === 0) {
+          drawSnakeHead(part.x, part.y);
+        } else {
+          ctx.drawImage(snakeBodyImg, part.x, part.y, box, box);
+        }
       });
 
-      // 畫食物
       foods.forEach(food => {
         ctx.drawImage(foodImg, food.x, food.y, box, box);
       });
 
-      // 畫分數
       document.getElementById("score").innerText = "分數: " + score;
     }
 
@@ -109,13 +121,11 @@
       if(direction === "LEFT") head.x -= box;
       if(direction === "RIGHT") head.x += box;
 
-      // 撞牆判斷
       if(head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) {
         alert("遊戲結束！分數: " + score);
         return false;
       }
 
-      // 撞到自己判斷
       for(let i = 0; i < snake.length; i++) {
         if(head.x === snake[i].x && head.y === snake[i].y) {
           alert("遊戲結束！分數: " + score);
