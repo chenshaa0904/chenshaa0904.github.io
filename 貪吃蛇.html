@@ -6,11 +6,17 @@
   <style>
     body {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      flex-direction: row; /* 左右排列 */
+      align-items: flex-start;
       justify-content: center;
       background-color: #fafafa;
       font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #gameArea {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     #gameCanvas {
       border: 2px solid black;
@@ -27,27 +33,65 @@
       font-size: 16px;
       cursor: pointer;
     }
+    #instructions {
+      margin-left: 30px;
+      max-width: 250px;
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    #instructions h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #333;
+    }
+    #instructions ul {
+      padding-left: 20px;
+    }
+    #instructions li {
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
-  <h1>🐍 貪吃蛇遊戲</h1>
-  <div id="score">分數: 0</div>
-  <canvas id="gameCanvas" width="1000" height="600"></canvas>
-  <button id="restartBtn">重新開始</button>
+  <div id="gameArea">
+    <h1>🐍 貪吃蛇遊戲</h1>
+    <div id="score">分數: 0</div>
+    <canvas id="gameCanvas" width="1000" height="800"></canvas>
+    <button id="restartBtn">重新開始</button>
+  </div>
+
+  <!-- 遊玩方式說明 -->
+  <div id="instructions">
+    <h2>遊玩方式說明</h2>
+    <ul>
+      <li>使用方向鍵控制蛇移動</li>
+      <li>吃到食物加分，撞到牆或自己就結束</li>
+      <li>按下「重新開始」以再玩一次</li>
+    </ul>
+  </div>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const box = 40;
 
-    const snakeHeadImg = new Image();
-    snakeHeadImg.src = "snake-head.png";
+    const snakeHeadUpImg = new Image();
+    snakeHeadUpImg.src = "images/snake-head-up.png";
+    const snakeHeadDownImg = new Image();
+    snakeHeadDownImg.src = "images/snake-head-down.png";
+    const snakeHeadLeftImg = new Image();
+    snakeHeadLeftImg.src = "images/snake-head-left.png";
+    const snakeHeadRightImg = new Image();
+    snakeHeadRightImg.src = "images/snake-head-right.png";
 
     const snakeBodyImg = new Image();
-    snakeBodyImg.src = "snake-body.png";
+    snakeBodyImg.src = "images/snake-body.png";
 
     const foodImg = new Image();
-    foodImg.src = "snake-food.png";
+    foodImg.src = "images/snake-food.png";
 
     let snake, direction, foods, score, lastTime, speed;
 
@@ -84,14 +128,20 @@
     }
 
     function drawSnakeHead(x, y) {
-      ctx.save();
-      ctx.translate(x + box/2, y + box/2);
-      if(direction === "UP") ctx.rotate(-Math.PI/2);
-      if(direction === "DOWN") ctx.rotate(Math.PI/2);
-      if(direction === "LEFT") ctx.rotate(Math.PI);
-      // RIGHT 不旋轉
-      ctx.drawImage(snakeHeadImg, -box/2, -box/2, box, box);
-      ctx.restore();
+      switch(direction) {
+        case "UP":
+          ctx.drawImage(snakeHeadUpImg, x, y, box, box);
+          break;
+        case "DOWN":
+          ctx.drawImage(snakeHeadDownImg, x, y, box, box);
+          break;
+        case "LEFT":
+          ctx.drawImage(snakeHeadLeftImg, x, y, box, box);
+          break;
+        case "RIGHT":
+          ctx.drawImage(snakeHeadRightImg, x, y, box, box);
+          break;
+      }
     }
 
     function draw() {
