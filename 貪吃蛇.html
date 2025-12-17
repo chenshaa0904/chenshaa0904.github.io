@@ -46,7 +46,7 @@
       direction = "RIGHT";
       foods = generateFoods(5); // 一次生成 5 個食物
       score = 0;
-      speed = 80; // 固定速度 (毫秒)，不會隨分數改變
+      speed = 100; // 固定速度 (毫秒)，不會隨分數改變
       lastTime = 0;
       document.getElementById("score").innerText = "分數: " + score;
       requestAnimationFrame(gameLoop);
