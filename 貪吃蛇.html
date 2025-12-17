@@ -32,24 +32,22 @@
 <body>
   <h1>🐍 貪吃蛇遊戲</h1>
   <div id="score">分數: 0</div>
-  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <!-- 把框框加大，改成 600x600 -->
+  <canvas id="gameCanvas" width="600" height="600"></canvas>
   <button id="restartBtn">重新開始</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const box = 20; // 每個方塊大小
-    let snake, direction, food, score, lastTime, speed;
+    let snake, direction, foods, score, lastTime, speed;
 
     function initGame() {
-      snake = [{x: 200, y: 200}];
+      snake = [{x: 300, y: 300}];
       direction = "RIGHT";
-      food = {
-        x: Math.floor(Math.random() * (canvas.width / box)) * box,
-        y: Math.floor(Math.random() * (canvas.height / box)) * box
-      };
+      foods = generateFoods(5); // 一次生成 5 個食物
       score = 0;
-      speed = 150; // 初始速度 (毫秒)
+      speed = 150; // 初始速度
       lastTime = 0;
       document.getElementById("score").innerText = "分數: " + score;
       requestAnimationFrame(gameLoop);
@@ -65,6 +63,18 @@
       if(event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
     }
 
+    // 生成多個食物，避免邊邊
+    function generateFoods(count) {
+      let arr = [];
+      for(let i = 0; i < count; i++) {
+        arr.push({
+          x: Math.floor(Math.random() * ((canvas.width - box*2) / box) + 1) * box,
+          y: Math.floor(Math.random() * ((canvas.height - box*2) / box) + 1) * box
+        });
+      }
+      return arr;
+    }
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -74,9 +84,11 @@
         ctx.fillRect(part.x, part.y, box, box);
       });
 
-      // 畫食物
-      ctx.fillStyle = "red";
-      ctx.fillRect(food.x, food.y, box, box);
+      // 畫多個食物
+      foods.forEach(food => {
+        ctx.fillStyle = "red";
+        ctx.fillRect(food.x, food.y, box, box);
+      });
 
       // 畫分數
       document.getElementById("score").innerText = "分數: " + score;
@@ -105,18 +117,27 @@
 
       snake.unshift(head);
 
-      // 吃到食物
-      if(head.x === food.x && head.y === food.y) {
-        score++;
-        // 隨分數加快速度
-        if(speed > 60) speed -= 5;
-        food = {
-          x: Math.floor(Math.random() * (canvas.width / box)) * box,
-          y: Math.floor(Math.random() * (canvas.height / box)) * box
-        };
-      } else {
+      // 檢查是否吃到食物
+      let ate = false;
+      foods.forEach((food, index) => {
+        if(head.x === food.x && head.y === food.y) {
+          score++;
+          ate = true;
+          // 替換成新的食物位置
+          foods[index] = {
+            x: Math.floor(Math.random() * ((canvas.width - box*2) / box) + 1) * box,
+            y: Math.floor(Math.random() * ((canvas.height - box*2) / box) + 1) * box
+          };
+        }
+      });
+
+      if(!ate) {
         snake.pop();
+      } else {
+        // 分數越高速度越快
+        if(speed > 60) speed -= 5;
       }
+
       return true;
     }
 
