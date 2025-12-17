@@ -32,7 +32,6 @@
 <body>
   <h1>🐍 貪吃蛇遊戲</h1>
   <div id="score">分數: 0</div>
-  <!-- 把框框加大，改成 600x600 -->
   <canvas id="gameCanvas" width="600" height="600"></canvas>
   <button id="restartBtn">重新開始</button>
 
@@ -47,7 +46,7 @@
       direction = "RIGHT";
       foods = generateFoods(5); // 一次生成 5 個食物
       score = 0;
-      speed = 80; // 初始速度
+      speed = 80; // 固定速度 (毫秒)，不會隨分數改變
       lastTime = 0;
       document.getElementById("score").innerText = "分數: " + score;
       requestAnimationFrame(gameLoop);
@@ -133,9 +132,6 @@
 
       if(!ate) {
         snake.pop();
-      } else {
-        // 分數越高速度越快
-        if(speed > 60) speed -= 5;
       }
 
       return true;
