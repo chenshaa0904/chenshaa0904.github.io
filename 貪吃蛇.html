@@ -6,11 +6,17 @@
   <style>
     body {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      flex-direction: row; /* 左右排列：左邊遊戲，右邊說明 */
+      align-items: flex-start;
       justify-content: center;
       background-color: #fafafa;
       font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #gameArea {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     #gameCanvas {
       border: 2px solid black;
@@ -27,13 +33,45 @@
       font-size: 16px;
       cursor: pointer;
     }
+    #instructions {
+      margin-left: 30px;
+      max-width: 250px;
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    #instructions h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #333;
+    }
+    #instructions ul {
+      padding-left: 20px;
+    }
+    #instructions li {
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
-  <h1>🐍 貪吃蛇遊戲</h1>
-  <div id="score">分數: 0</div>
-  <canvas id="gameCanvas" width="1000" height="800"></canvas>
-  <button id="restartBtn">重新開始</button>
+  <div id="gameArea">
+    <h1>🐍 貪吃蛇遊戲</h1>
+    <div id="score">分數: 0</div>
+    <canvas id="gameCanvas" width="1000" height="800"></canvas>
+    <button id="restartBtn">重新開始</button>
+  </div>
+
+  <!-- 遊玩方式說明 -->
+  <div id="instructions">
+    <h2>遊玩方式說明</h2>
+    <ul>
+      <li>使用方向鍵控制蛇移動</li>
+      <li>吃到食物加分，撞到牆或自己就結束</li>
+      <li>按下「重新開始」以再玩一次</li>
+    </ul>
+  </div>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
