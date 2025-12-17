@@ -39,7 +39,7 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const box = 20; // 每個方塊大小
-    let snake, direction, food, score, game;
+    let snake, direction, food, score, lastTime, speed;
 
     function initGame() {
       snake = [{x: 200, y: 200}];
@@ -49,9 +49,10 @@
         y: Math.floor(Math.random() * (canvas.height / box)) * box
       };
       score = 0;
+      speed = 150; // 初始速度 (毫秒)
+      lastTime = 0;
       document.getElementById("score").innerText = "分數: " + score;
-      if (game) clearInterval(game);
-      game = setInterval(gameLoop, 150);
+      requestAnimationFrame(gameLoop);
     }
 
     document.addEventListener("keydown", changeDirection);
@@ -90,17 +91,15 @@
 
       // 撞牆判斷
       if(head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) {
-        clearInterval(game);
         alert("遊戲結束！分數: " + score);
-        return;
+        return false;
       }
 
       // 撞到自己判斷
       for(let i = 0; i < snake.length; i++) {
         if(head.x === snake[i].x && head.y === snake[i].y) {
-          clearInterval(game);
           alert("遊戲結束！分數: " + score);
-          return;
+          return false;
         }
       }
 
@@ -109,6 +108,8 @@
       // 吃到食物
       if(head.x === food.x && head.y === food.y) {
         score++;
+        // 隨分數加快速度
+        if(speed > 60) speed -= 5;
         food = {
           x: Math.floor(Math.random() * (canvas.width / box)) * box,
           y: Math.floor(Math.random() * (canvas.height / box)) * box
@@ -116,11 +117,16 @@
       } else {
         snake.pop();
       }
+      return true;
     }
 
-    function gameLoop() {
-      update();
-      draw();
+    function gameLoop(timestamp) {
+      if(timestamp - lastTime > speed) {
+        lastTime = timestamp;
+        if(!update()) return; // 遊戲結束就停止
+        draw();
+      }
+      requestAnimationFrame(gameLoop);
     }
 
     // 初始化遊戲
